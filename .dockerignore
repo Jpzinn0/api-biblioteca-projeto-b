@@ -1,0 +1,5 @@
+# evita copiar para dentro da imagem o que não deve ir (e deixa o build mais rápido)
+node_modules
+.env
+.git
+coverage

@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: API Geração Tech 4.0 - Biblioteca
+  version: 1.0.0
+  description: |
+    API REST desenvolvida em Node.js com Clean Architecture e Prisma ORM para gerenciamento de empréstimos de livros.
+    Implementa as regras de negócio de existência (R1), disponibilidade (R2) e prazo fixo de devolução de 14 dias (R3).
+servers:
+  - url: http://localhost:3000
+    description: Servidor de Desenvolvimento Local (Docker)
+
+paths:
+  /emprestimos:
+    post:
+      summary: Realizar um novo empréstimo de livro
+      description: |
+        Registra um empréstimo associando um leitor a um livro existente e disponível.
+        Aplica as seguintes regras de negócio:
+        - **R1:** Verifica se o livro existe no banco de dados.
+        - **R2:** Verifica se o livro está disponível para empréstimo.
+        - **R3:** Define automaticamente a data de devolução para 14 dias a partir da data atual.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - livroId
+                - leitor
+              properties:
+                livroId:
+                  type: integer
+                  example: 1
+                  description: ID único do livro a ser emprestado.
+                leitor:
+                  type: string
+                  example: "João"
+                  description: Nome do leitor responsável pelo empréstimo.
+      responses:
+        '201':
+          description: Empréstimo realizado com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  leitor:
+                    type: string
+                    example: "João"
+                  dataEmprestimo:
+                    type: string
+                    format: date-time
+                    example: "2026-11-16T18:19:30.787Z"
+                  dataDevolucao:
+                    type: string
+                    format: date-time
+                    example: "2026-11-30T18:19:30.781Z"
+                  livroId:
+                    type: integer
+                    example: 1
+        '400':
+          description: Dados inválidos ou livro indisponível (Violação da regra R2).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                properties:
+                  error:
+                    type: string
+                    example: "Livro indisponível para empréstimo."
+        '404':
+          description: Livro não encontrado no sistema (Violação da regra R1).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Livro não encontrado."
+        '500':
+          description: Erro interno do servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Erro interno no servidor."

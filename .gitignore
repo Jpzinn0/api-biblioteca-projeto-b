@@ -1,0 +1,6 @@
+# dependências (se reinstalam com npm ci)
+node_modules
+# segredos reais: NUNCA commitar
+.env
+# relatórios de cobertura gerados nos testes
+coverage
